@@ -1,38 +1,31 @@
-  data {
-    int N;
-    real Y[N];
-    real X[N];
-    real W[N];
-    int G[N]; 
-    int NG;
-  }
+
+data {
+  int<lower=0> NT;
+  int<lower=0> NG;
+  int<lower=0> Z[NT];
+  int<lower=0> N[NT];
+  int<lower=0> G[NT];
+}
+
+parameters {
+  real<lower=0, upper=1> omega_o;
+  real<lower=2> kappa_o;
   
-  parameters {
-    real m_a0;
-    real m_a1;
-    real m_a2;
-    real <lower=0> s_a0;
-    real <lower=0> s_a1;
-    real <lower=0> s_a2;
-    real a0[NG];
-    real a1[NG];
-    real a2[NG];
-    real<lower=0> sigma;
-    real<lower=0> nu_minus_one;
-  }
+  real<lower=0, upper=1> omega[NG];
+  real<lower=0> kappa_minus2[NG];
   
-  transformed parameters {
-    real nu = nu_minus_one + 1;
+  real<lower=0, upper=1> theta[NT];
+}
+
+model {
+  for (j in 1:NG) {
+    omega[j] ~ beta(omega_o * (kappa_o - 2) + 1, (1 - omega_o) * (kappa_o - 2) + 1);
+    kappa_minus2[j] ~ 
   }
-  
-  model {
-    a0 ~ normal(m_a0, s_a0);
-    a1 ~ normal(m_a1, s_a1);
-    a2 ~ normal(m_a2, s_a2);
-    nu_minus_one ~ exponential(1.0 / 29.0);
-    for (i in 1:N) {
-      int j = G[i];
-      real mu = a0[j] + a1[j] * X[i] + a2[j] * (X[i] ^ 2);
-      Y[i] ~ normal(mu, W[i] * sigma);
-    }
+  for (i in 1:NT) {
+    real o = omega[G[i]];
+    real k = kappa[G[i]];
+    theta[i] ~ beta(o * (k- 2) + 1, (1 - o) * (k- 2) + 1);
+    Z[i] ~ binomial(N[i], theta[i]);
   }
+}
