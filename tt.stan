@@ -1,4 +1,3 @@
-
 data {
   int<lower=0> NT;
   int<lower=0> NG;
@@ -17,11 +16,19 @@ parameters {
   real<lower=0, upper=1> theta[NT];
 }
 
-model {
+transformed parameters {
+  real kappa[NG];
   for (j in 1:NG) {
-    omega[j] ~ beta(omega_o * (kappa_o - 2) + 1, (1 - omega_o) * (kappa_o - 2) + 1);
-    kappa_minus2[j] ~ 
+    kappa[j] = kappa_minus2[j] + 2; 
   }
+}
+
+model {
+  omega_o ~ beta(1, 1);
+  kappa_o ~ gamma(0.01, 0.01);
+  
+  omega ~ beta(omega_o * (kappa_o - 2) + 1, (1 - omega_o) * (kappa_o - 2) + 1);
+  kappa_minus2 ~ gamma(0.01, 0.01);
   for (i in 1:NT) {
     real o = omega[G[i]];
     real k = kappa[G[i]];

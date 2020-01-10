@@ -61,11 +61,10 @@ plot_result <- function(comp) {
       plot_post(res, "omega", comp_val = 0.5, title = "Posteria of Omega"), 
       ncol = 2
     ), 
-    plot_post_pair_diff(res, comp, "theta", comp_val = 0.5, mle_func = get_mle), 
+    plot_post_pair_diff(res, comp, par_prefix = "theta", comp_val = 0.5, mle_func = get_mle), 
     heights = c(1.5, length(comp))
   )
 }
-
 p <- plot_result(c(1, 14, 28))
 ggsave(plot_file_name("results1"), p)
 
