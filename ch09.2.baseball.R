@@ -52,10 +52,7 @@ model {
 ")
 
 data <- read_csv("data/BattingAverage.csv") %>% 
-  mutate(
-    pos_ft = factor(PriPos), 
-    pos = as.integer(pos_ft)
-  )
+  mutate(pos = as.integer(factor(PriPos)))
 stan_data <- list(
   NT = nrow(data), 
   NG = n_distinct(data$pos), 
@@ -80,6 +77,21 @@ res <- fit_to_tibble(fit)
 id_to_mle <- function(idx) data$Hits[[idx]] / data$AtBats[[idx]]
 pos_map <- data %>% select(PriPos, pos) %>% distinct()
 id_to_pos <- function(id) filter(pos_map, pos == id)$PriPos
+
+data %>% select(PriPos, pos) 
+
+
+players <- data %>% 
+  transmute(
+    id = 1:n(), 
+    ba_mle = Hits / AtBats, 
+    Player
+  )
+
+positions <- data %>% 
+  group_by(pos) %>% 
+  summarise(pos_name = first(PriPos), ba_mle = sum(Hits) / sum(AtBats))
+
 
 # picher vs catcher
 # figure9.14

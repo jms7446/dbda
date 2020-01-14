@@ -1,38 +1,28 @@
-data {
-  int<lower=0> NT;
-  int<lower=0> NG;
-  int<lower=0> Z[NT];
-  int<lower=0> N[NT];
-  int<lower=0> G[NT];
-}
-
-parameters {
-  real<lower=0, upper=1> omega_o;
-  real<lower=2> kappa_o;
-  
-  real<lower=0, upper=1> omega[NG];
-  real<lower=0> kappa_minus2[NG];
-  
-  real<lower=0, upper=1> theta[NT];
-}
-
-transformed parameters {
-  real kappa[NG];
-  for (j in 1:NG) {
-    kappa[j] = kappa_minus2[j] + 2; 
+  data {
+    int<lower=0> N;
+    int<lower=0> K;
+    matrix[N, K] x;
+    vector[N] y;
   }
-}
-
-model {
-  omega_o ~ beta(1, 1);
-  kappa_o ~ gamma(0.01, 0.01);
   
-  omega ~ beta(omega_o * (kappa_o - 2) + 1, (1 - omega_o) * (kappa_o - 2) + 1);
-  kappa_minus2 ~ gamma(0.01, 0.01);
-  for (i in 1:NT) {
-    real o = omega[G[i]];
-    real k = kappa[G[i]];
-    theta[i] ~ beta(o * (k- 2) + 1, (1 - o) * (k- 2) + 1);
-    Z[i] ~ binomial(N[i], theta[i]);
+  transformed data {
   }
-}
+  
+  parameters {
+    real sigma_beta;
+    real alpha;
+    vector[K] beta;
+    real<lower=0> sigma;
+    real<lower=0> nu_minus1;
+  }
+  
+  transformed parameters {
+    real nu = nu_minus1 + 1;
+  }
+  
+  model {
+    sigma_beta ~ gamma(2.618,1.618);   // mode 1.0, sd 1.0;
+    beta ~ student_t(2, 0, sigma_beta);
+    nu_minus1 ~ exponential(1 / 29.0);
+    y ~ student_t(nu, x * beta + alpha, sigma);
+  }
