@@ -1,7 +1,9 @@
 # dbda
 ```
-# clone tool repo
-git clone https://github.com/jms7446/r_tools.git
-# make symbolic link in current dir
-ln -s ${SOME_WHERE}/r_tools tools
+# clone 
+git clone https://github.com/jms7446/dbda.git
+
+# make submodule r_tools valid
+git submodule init
+git submodule update
 ```
