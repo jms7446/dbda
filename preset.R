@@ -25,3 +25,5 @@ options(warnPartialMatchDollar = TRUE)
 Sys.setenv("_R_CHECK_LENGTH_1_CONDITION_" = "true")
 options(warnPartialMatchArgs = TRUE)
 
+set_plot_size(6, 4, 200)
+
